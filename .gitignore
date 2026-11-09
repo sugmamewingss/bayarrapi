@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env
+.env.local
+*.db
+*.db-journal
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+.DS_Store

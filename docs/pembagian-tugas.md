@@ -23,7 +23,3 @@ Analisis kompetitor sudah selesai (dikerjakan bersama, 9 Nov 2026). Pernyataan A
 | 18 - 21 Nov 2026 | Integrasi: webhook memanggil contract, rekonsiliasi, halaman cek bukti. Draf bagian business case masing-masing masuk ke dokumen. |
 | 22 - 24 Nov 2026 | Uji skenario sukses, gagal, kedaluwarsa, webhook palsu, webhook ganda. Finalisasi dan kumpulkan business case (24 Nov). |
 | 25 Nov - presentasi | Rekam video demo, slide, latihan tanya jawab. |
-
-## Progress report (sebelum 24 Nov)
-
-Yang bisa ditunjukkan ke dosen: revisi konsep multi-penerima, analisis kompetitor, repo + pembagian tugas, ERD, rancangan smart contract, dan demo alur pay-in sandbox kalau sudah jalan.

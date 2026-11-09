@@ -12,8 +12,6 @@ Pembagian ini awal dan boleh ditukar setelah tim tahu kekuatan masing-masing. Ca
 | Mukhamad Irfan Nur Khakim | Smart contract `BayarRapiLedger`: tulis, uji, deploy ke Sepolia; modul server yang memanggil contract + antrean retry | Arsitektur sistem, manajemen risiko (operasional, siber) | Diagram arsitektur, alasan pakai blockchain |
 | Rakapaksi Satrya Putra | Frontend: form batch kirim, dashboard status, halaman cek bukti penerima | Masalah dan segmen, pasar TAM/SAM/SOM, BMC, roadmap dan KPI | User stories, slide presentasi, video demo |
 
-Analisis kompetitor sudah selesai (dikerjakan bersama, 9 Nov 2026). Pernyataan AI diisi semua anggota.
-
 ## Jadwal
 
 | Periode | Target |
@@ -23,7 +21,3 @@ Analisis kompetitor sudah selesai (dikerjakan bersama, 9 Nov 2026). Pernyataan A
 | 18 - 21 Nov 2026 | Integrasi: webhook memanggil contract, rekonsiliasi, halaman cek bukti. Draf bagian business case masing-masing masuk ke dokumen. |
 | 22 - 24 Nov 2026 | Uji skenario sukses, gagal, kedaluwarsa, webhook palsu, webhook ganda. Finalisasi dan kumpulkan business case (24 Nov). |
 | 25 Nov - presentasi | Rekam video demo, slide, latihan tanya jawab. |
-
-## Progress report (sebelum 24 Nov)
-
-Yang bisa ditunjukkan ke dosen: revisi konsep multi-penerima, analisis kompetitor, repo + pembagian tugas, ERD, rancangan smart contract, dan demo alur pay-in sandbox kalau sudah jalan.

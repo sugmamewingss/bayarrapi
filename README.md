@@ -32,6 +32,27 @@ Semua transaksi memakai **sandbox/test mode dan testnet**. Tidak ada uang nyata,
 - Solidity + Hardhat, jaringan Ethereum Sepolia
 - Basis data: SQLite via Prisma (cukup untuk prototipe)
 
+## Cara menjalankan (lokal)
+
+Butuh Node.js 20 atau lebih baru.
+
+```bash
+cd apps/web
+npm install
+cp ../.env.example .env   # lalu isi nilainya
+npm run dev
+```
+
+Buka http://localhost:3000.
+
+Smart contract:
+
+```bash
+cd contracts
+npm install
+npx hardhat compile
+```
+
 ## Aturan kerja tim
 
 - Jangan pernah commit API key. Simpan di `.env.local` (lihat `.env.example`).

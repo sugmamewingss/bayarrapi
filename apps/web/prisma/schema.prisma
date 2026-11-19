@@ -1,0 +1,97 @@
+// Skema basis data BayarRapi (prototipe, SQLite).
+// Status disimpan sebagai String karena SQLite; nilai yang valid ditulis di komentar.
+// Semua nominal dalam Rupiah (bilangan bulat).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Sender {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  batches   Batch[]
+}
+
+model Batch {
+  id              String    @id @default(cuid())
+  senderId        String
+  sender          Sender    @relation(fields: [senderId], references: [id])
+  // ID yang dikirim ke Xendit sebagai external_id invoice
+  externalId      String    @unique
+  // DRAFT | PENDING_PAYMENT | FUNDED | DISBURSING | COMPLETED | PARTIAL_FAILED | EXPIRED
+  status          String    @default("DRAFT")
+  // Jumlah nominal semua penerima (belum termasuk fee)
+  totalAmount     Int
+  // Fee BayarRapi = FEE_PER_RECIPIENT x jumlah penerima
+  feeAmount       Int
+  // keccak256 dari daftar penerima, dicatat ke smart contract
+  recipientsHash  String?
+  xenditInvoiceId String?   @unique
+  invoiceUrl      String?
+  paidAt          DateTime?
+  chainTxHash     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  recipients      Recipient[]
+}
+
+model Recipient {
+  id             String   @id @default(cuid())
+  batchId        String
+  batch          Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  name           String
+  // Kode bank dari BANKS di src/lib/constants.ts (BCA, BNI, BRI, ...)
+  bankCode       String
+  accountNumber  String
+  amount         Int
+  // PENDING | PROCESSING | SUCCEEDED | FAILED
+  status         String   @default("PENDING")
+  failureCode    String?
+  xenditPayoutId String?  @unique
+  // Dikirim sebagai header Idempotency-key ke Xendit Payouts API
+  idempotencyKey String   @unique
+  // Kode yang diberikan ke penerima untuk cek bukti
+  proofCode      String   @unique
+  // keccak256(batchId, recipientId, amount, proofCode), dicatat on-chain
+  proofHash      String?  @unique
+  chainTxHash    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([batchId])
+}
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  // INVOICE | PAYOUT
+  source      String
+  // Kunci unik notifikasi, mencegah webhook ganda diproses dua kali
+  eventKey    String    @unique
+  payload     String
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+}
+
+model ChainJob {
+  id        String   @id @default(cuid())
+  // RECORD_BATCH | RECORD_PAYOUT
+  type      String
+  // Batch.id atau Recipient.id
+  refId     String
+  // QUEUED | DONE | FAILED
+  status    String   @default("QUEUED")
+  attempts  Int      @default(0)
+  lastError String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, refId])
+  @@index([status])
+}

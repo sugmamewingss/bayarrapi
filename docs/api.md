@@ -40,7 +40,7 @@ Response `201`: `{ "id": "...", "externalId": "BR-20261119-7KQ2MX", "status": "D
 
 ## POST /api/batches/:id/checkout
 
-Response `200`: `{ "invoiceUrl": "...", "mode": "simulation" }`. Batch berubah dari `DRAFT` ke `PENDING_PAYMENT`. Nominal invoice = total penerima + fee Rp3.500 per penerima.
+Response `200`: `{ "invoiceUrl": "...", "mode": "simulation" }`. Batch berubah dari `DRAFT` ke `PENDING_PAYMENT`. Nominal invoice = total penerima + fee Rp2.900 per penerima.
 
 ## POST /api/webhooks/xendit/invoice
 
@@ -49,7 +49,7 @@ Dipanggil Xendit. Header `x-callback-token` wajib sama dengan `XENDIT_CALLBACK_T
 Contoh body dari Xendit (dipotong):
 
 ```json
-{ "id": "inv_123", "external_id": "BR-20261119-7KQ2MX", "status": "PAID", "amount": 935500 }
+{ "id": "inv_123", "external_id": "BR-20261119-7KQ2MX", "status": "PAID", "amount": 933700 }
 ```
 
 | Kondisi | Respons |

@@ -40,7 +40,7 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
 
       {recipient && (
         <section className="card" style={{ marginTop: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
             <div>
               <div className="stat-label">Dialokasikan untuk</div>
               <h2 style={{ margin: 0 }}>{recipient.name}</h2>

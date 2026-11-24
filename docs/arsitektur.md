@@ -1,7 +1,5 @@
 # Arsitektur Sistem (draf awal)
 
-Penanggung jawab: Irfan.
-
 ```mermaid
 sequenceDiagram
     actor P as Pengirim

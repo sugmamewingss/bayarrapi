@@ -124,4 +124,10 @@ Menghitung ulang hash bukti dari data penerima lalu membaca `getPayout()` di kon
 
 ## GET /api/reports/reconciliation
 
-Per batch yang sudah dibayar: uang masuk, alokasi, terkirim, gagal (wajib refund), fee, biaya payout Xendit (Rp2.500 per payout berhasil), margin, dan kelengkapan catatan on-chain. Kolom `cocok` bernilai YA jika uang masuk = alokasi + fee, alokasi = terkirim + gagal, tidak ada payout yang masih diproses, dan semua hasil sudah tercatat on-chain. Tambahkan `format=csv` untuk unduhan.
+Kebijakan: transfer gagal dikembalikan penuh ke pengirim, nominal dan fee Rp2.900-nya. Fee hanya menjadi pendapatan untuk transfer yang berhasil.
+
+Per batch yang sudah dibayar: uang masuk, alokasi, terkirim, gagal, refund (nominal + fee transfer gagal), fee dari transfer berhasil, biaya payout Xendit (Rp2.500 per payout berhasil), margin (fee berhasil dikurangi biaya Xendit), dan kelengkapan catatan on-chain.
+
+Kolom `cocok` bernilai YA jika uang masuk = terkirim + refund + fee transfer berhasil, tidak ada payout yang masih diproses, dan semua hasil sudah tercatat on-chain.
+
+Tambahkan `format=csv` untuk unduhan. Waktu dalam WIB. Baris pertama `sep=,` supaya Excel dengan setelan regional Indonesia tetap memisahkan kolom dengan benar.

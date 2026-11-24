@@ -11,7 +11,7 @@ const config: HardhatUserConfig = {
   solidity: "0.8.24",
   networks: {
     sepolia: {
-      url: SEPOLIA_RPC_URL ?? "",
+      url: SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com",
       accounts: OPERATOR_PRIVATE_KEY ? [OPERATOR_PRIVATE_KEY] : [],
     },
   },

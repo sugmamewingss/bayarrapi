@@ -1,10 +1,29 @@
 # contracts
 
-Smart contract `BayarRapiLedger` (Solidity + Hardhat), deploy ke Ethereum Sepolia. Penanggung jawab: Irfan.
+Smart contract `BayarRapiLedger` (Solidity 0.8.24 + Hardhat), dideploy ke Ethereum Sepolia.
 
-Rancangan fungsi:
-- `recordBatch(bytes32 batchId, bytes32 recipientsHash, uint256 totalAmount, uint16 count)`: hanya operator.
-- `recordPayout(bytes32 batchId, bytes32 proofHash, uint8 status)`: hanya operator.
-- `getBatch(bytes32 batchId)` dan `getPayout(bytes32 proofHash)`: baca publik untuk halaman cek penerima.
+Kontrak tidak memegang dana. Isinya hanya catatan hash:
 
-Tidak ada data pribadi (nama, nomor rekening) yang disimpan di contract.
+| Fungsi | Siapa | Kegunaan |
+| --- | --- | --- |
+| `recordBatch(batchId, recipientsHash, totalAmount, recipientCount)` | Operator (server) | Dicatat sekali setelah pembayaran batch terverifikasi |
+| `recordPayout(batchId, proofHash, status)` | Operator (server) | Dicatat sekali per penerima setelah status payout final (1 berhasil, 2 gagal) |
+| `getBatch(batchId)`, `getPayout(proofHash)` | Publik | Dibaca halaman cek bukti penerima |
+| `setOperator(address)` | Owner | Mengganti alamat server yang berhak menulis |
+
+Tidak ada data pribadi (nama, nomor rekening) di kontrak.
+
+## Menjalankan
+
+```bash
+cd contracts
+npm install
+npx hardhat compile
+npx hardhat test
+```
+
+## Deploy ke Sepolia
+
+1. Salin `.env.example` menjadi `.env`, isi `OPERATOR_PRIVATE_KEY` dengan private key wallet khusus testnet yang punya Sepolia ETH.
+2. Jalankan `npm run deploy:sepolia`.
+3. Salin alamat kontrak ke `apps/web/.env` sebagai `LEDGER_CONTRACT_ADDRESS`.

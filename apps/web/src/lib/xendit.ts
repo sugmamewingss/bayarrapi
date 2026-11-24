@@ -1,4 +1,4 @@
-import { env } from "./env";
+import { xenditSecretKey } from "./env";
 
 const XENDIT_BASE_URL = "https://api.xendit.co";
 
@@ -21,7 +21,7 @@ type RequestOptions = {
 // Autentikasi: Basic Auth dengan secret key sebagai username dan password kosong.
 export async function xenditRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, headers = {} } = options;
-  const auth = Buffer.from(`${env().XENDIT_SECRET_KEY}:`).toString("base64");
+  const auth = Buffer.from(`${xenditSecretKey()}:`).toString("base64");
 
   const res = await fetch(`${XENDIT_BASE_URL}${path}`, {
     method,

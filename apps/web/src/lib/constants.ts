@@ -1,6 +1,10 @@
-// Fee BayarRapi per penerima (Rupiah). Biaya payout Xendit Rp2.500,
-// jadi margin per penerima Rp500. Angka ini harus sama dengan business case.
-export const FEE_PER_RECIPIENT = 3000;
+// Fee BayarRapi per penerima (Rupiah). Biaya payout Xendit Rp2.500 adalah batas bawah,
+// jadi margin per transfer Rp400 sebelum biaya on-chain. Margin utama datang dari
+// langganan Paket Bisnis (Rp149.000 per bulan). Harus sama dengan business case.
+export const FEE_PER_RECIPIENT = 2900;
+
+// Batas jumlah penerima per batch untuk prototipe.
+export const MAX_RECIPIENTS = 50;
 
 // Batas nominal per penerima (Rupiah) untuk prototipe.
 export const MIN_AMOUNT = 10_000;

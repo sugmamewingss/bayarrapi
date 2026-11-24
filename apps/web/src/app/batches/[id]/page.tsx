@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { formatRupiah } from "@/lib/constants";
+import { FEE_PER_RECIPIENT, formatRupiah } from "@/lib/constants";
 import { bankName, formatDateTime, maskAccount } from "@/lib/format";
 import { BATCH_STEPS } from "@/lib/status";
 import { BatchStatusBadge, RecipientStatusBadge } from "@/components/StatusBadge";
@@ -85,9 +85,9 @@ export default async function BatchDetailPage({
       )}
       {batch.status === "PARTIAL_FAILED" && (
         <div className="alert alert-error">
-          {failedRecipients.length} penerima gagal dikirim (total{" "}
-          {formatRupiah(failedRecipients.reduce((t, r) => t + r.amount, 0))}). Dana ini wajib dikembalikan ke pengirim
-          dan tercatat di laporan rekonsiliasi.
+          {failedRecipients.length} penerima gagal dikirim. Nominal dan fee-nya dikembalikan ke pengirim: total{" "}
+          {formatRupiah(failedRecipients.reduce((t, r) => t + r.amount + FEE_PER_RECIPIENT, 0))}. Tercatat di laporan
+          rekonsiliasi.
         </div>
       )}
       {batch.status === "EXPIRED" && <div className="alert alert-error">Invoice kedaluwarsa. Buat batch baru untuk mencoba lagi.</div>}

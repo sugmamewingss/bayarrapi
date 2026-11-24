@@ -14,7 +14,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const to = sp.to && DATE.test(sp.to) ? sp.to : undefined;
   const rows = await buildReconciliation(from, to);
 
-  const total = (k: "invoiceAmount" | "succeededAmount" | "failedAmount" | "fee" | "xenditCost" | "margin") =>
+  const total = (k: "invoiceAmount" | "succeededAmount" | "refund" | "feeEarned" | "xenditCost" | "margin") =>
     rows.reduce((t, r) => t + r[k], 0);
   const qs = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}), format: "csv" });
 
@@ -56,12 +56,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           <div className="stat-value">{formatRupiah(total("succeededAmount"))}</div>
         </div>
         <div className="card">
-          <div className="stat-label">Wajib refund (gagal kirim)</div>
-          <div className="stat-value">{formatRupiah(total("failedAmount"))}</div>
+          <div className="stat-label">Wajib refund (nominal + fee gagal)</div>
+          <div className="stat-value">{formatRupiah(total("refund"))}</div>
         </div>
         <div className="card">
-          <div className="stat-label">Fee BayarRapi</div>
-          <div className="stat-value">{formatRupiah(total("fee"))}</div>
+          <div className="stat-label">Fee dari transfer berhasil</div>
+          <div className="stat-value">{formatRupiah(total("feeEarned"))}</div>
         </div>
         <div className="card">
           <div className="stat-label">Biaya payout Xendit</div>
@@ -86,7 +86,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                   <th>Dibayar</th>
                   <th className="num">Uang masuk</th>
                   <th className="num">Terkirim</th>
-                  <th className="num">Gagal</th>
+                  <th className="num">Refund</th>
                   <th className="num">Margin</th>
                   <th>On-chain</th>
                   <th>Cocok</th>
@@ -106,7 +106,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                     <td className="small">{formatDateTime(r.paidAt)}</td>
                     <td className="num">{formatRupiah(r.invoiceAmount)}</td>
                     <td className="num">{formatRupiah(r.succeededAmount)}</td>
-                    <td className="num">{formatRupiah(r.failedAmount)}</td>
+                    <td className="num">{formatRupiah(r.refund)}</td>
                     <td className="num">{formatRupiah(r.margin)}</td>
                     <td className="small">{r.onChain}</td>
                     <td title={r.note}>

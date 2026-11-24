@@ -187,6 +187,11 @@ p {
   margin-top: 16px;
 }
 
+/* Kartu di dalam grid diberi jarak oleh gap, bukan margin. */
+.grid > .card + .card {
+  margin-top: 0;
+}
+
 .grid {
   display: grid;
   gap: 16px;

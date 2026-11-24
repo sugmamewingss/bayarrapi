@@ -12,7 +12,7 @@ Tugas Akhir mata kuliah Teknologi Blockchain dan Platform Keuangan Dijital, FILK
 5. Batch dicatat ke smart contract di Ethereum Sepolia (hash daftar penerima dan total). Status batch: `FUNDED`.
 6. Backend mengirim payout per penerima lewat Xendit Payouts API dengan `Idempotency-key` per item.
 7. Webhook payout memperbarui status tiap penerima. Bukti tiap pencairan dicatat on-chain.
-8. Dashboard rekonsiliasi: total masuk = total terkirim + fee + yang gagal/dikembalikan.
+8. Laporan rekonsiliasi: uang masuk = terkirim + refund (nominal dan fee transfer gagal) + fee transfer berhasil.
 9. Halaman cek penerima: masukkan kode bukti, cocokkan dengan catatan on-chain.
 
 Semua transaksi memakai **sandbox/test mode dan testnet**. Tidak ada uang nyata, token bernilai, atau data pribadi asli.
@@ -23,7 +23,7 @@ Semua transaksi memakai **sandbox/test mode dan testnet**. Tidak ada uang nyata,
 | --- | --- |
 | `apps/web` | Aplikasi Next.js: dashboard pengirim, API route, webhook, halaman cek penerima |
 | `contracts` | Smart contract Solidity + Hardhat (deploy ke Sepolia) |
-| `docs` | Dokumentasi: pembagian tugas, log ide, user stories, ERD, arsitektur, API, pernyataan AI |
+| `docs` | Dokumentasi: log ide, user stories, ERD, arsitektur, API, pernyataan AI |
 
 ## Stack
 
@@ -40,10 +40,11 @@ Butuh Node.js 20 atau lebih baru.
 cd apps/web
 npm install
 cp ../.env.example .env   # lalu isi nilainya
+npm run db:migrate        # membuat tabel database (sekali saja)
 npm run dev
 ```
 
-Buka http://localhost:3000.
+Buka http://localhost:3000. Tanpa `XENDIT_SECRET_KEY`, aplikasi berjalan dalam mode simulasi. Tanpa `OPERATOR_PRIVATE_KEY`, pencatatan on-chain nonaktif.
 
 Smart contract:
 
@@ -51,11 +52,14 @@ Smart contract:
 cd contracts
 npm install
 npx hardhat compile
+npx hardhat test
 ```
+
+Kontrak `BayarRapiLedger` sudah di-deploy di Sepolia: [`0x82C35E808366bd38D8d948359FCbC1a9776675DE`](https://sepolia.etherscan.io/address/0x82C35E808366bd38D8d948359FCbC1a9776675DE). Detail di [contracts/README.md](contracts/README.md).
 
 ## Aturan kerja tim
 
-- Jangan pernah commit API key. Simpan di `.env.local` (lihat `.env.example`).
+- Jangan pernah commit API key. Simpan di `.env` (lihat `.env.example`).
 - Satu fitur = satu branch: `feat/<nama-fitur>`. Gabung ke `main` lewat Pull Request.
 - Tiap anggota commit dari akun GitHub sendiri. Riwayat commit per anggota ikut dinilai.
 - Format pesan commit: `feat: ...`, `fix: ...`, `docs: ...`, `chore: ...`, `test: ...`.
@@ -68,5 +72,3 @@ npx hardhat compile
 | Muhammad Farhan Muzakkiy | 245150707111048 |
 | Mukhamad Irfan Nur Khakim | 245150701111021 |
 | Rakapaksi Satrya Putra | 245150701111034 |
-
-Pembagian tugas: [`docs/pembagian-tugas.md`](docs/pembagian-tugas.md)

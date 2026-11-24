@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { formatRupiah } from "@/lib/constants";
 import { bankName, formatDateTime, maskAccount } from "@/lib/format";
 import { BatchStatusBadge, RecipientStatusBadge } from "@/components/StatusBadge";
+import { verifyProof } from "@/lib/proof";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
   const recipient = code
     ? await db.recipient.findUnique({ where: { proofCode: code }, include: { batch: true } })
     : null;
+  const check = recipient && code ? await verifyProof(code) : null;
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
@@ -71,17 +73,35 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
             <div className="small" style={{ fontWeight: 600 }}>
               Catatan blockchain
             </div>
-            {recipient.chainTxHash ? (
+            {check?.state === "verified" && (
+              <div className="small" style={{ margin: "4px 0" }}>
+                <span className="badge tone-green">Terverifikasi on-chain</span>{" "}
+                <span className="muted">
+                  Hash bukti cocok dengan smart contract, status {check.onChainStatus === "SUCCEEDED" ? "terkirim" : "gagal"},
+                  dicatat {formatDateTime(check.recordedAt)}.
+                </span>
+                <div className="mono muted" style={{ wordBreak: "break-all", marginTop: 4 }}>
+                  {check.proofHash}
+                </div>
+              </div>
+            )}
+            {check?.state === "mismatch" && (
+              <div className="small" style={{ margin: "4px 0" }}>
+                <span className="badge tone-red">Tidak cocok</span> <span className="muted">{check.reason}</span>
+              </div>
+            )}
+            {(check?.state === "pending" || check?.state === "unavailable") && (
+              <div className="muted small">{check.reason}.</div>
+            )}
+            {recipient.chainTxHash && (
               <a
                 href={`https://sepolia.etherscan.io/tx/${recipient.chainTxHash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="small"
               >
-                Lihat bukti pencairan di Etherscan (Sepolia)
+                Lihat transaksi di Etherscan (Sepolia)
               </a>
-            ) : (
-              <div className="muted small">Belum dicatat on-chain. Pencatatan aktif setelah modul blockchain terpasang.</div>
             )}
           </div>
         </section>

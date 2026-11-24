@@ -30,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/batches">Dashboard</Link>
               <Link href="/batches/new">Buat batch</Link>
               <Link href="/proof">Cek bukti</Link>
+              <Link href="/reports">Laporan</Link>
             </nav>
             <span className="mode-pill">SANDBOX · {modeLabel()}</span>
           </div>

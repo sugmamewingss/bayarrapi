@@ -8,6 +8,7 @@ import { BatchStatusBadge, RecipientStatusBadge } from "@/components/StatusBadge
 import AutoRefresh from "@/components/AutoRefresh";
 import RetryChainButton from "@/components/RetryChainButton";
 import { chainEnabled, processChainJobs } from "@/lib/chain";
+import Progress from "@/components/Progress";
 import PayButton from "./PayButton";
 
 const TX_URL = "https://sepolia.etherscan.io/tx/";
@@ -51,6 +52,8 @@ export default async function BatchDetailPage({
   const inProgress =
     ["PENDING_PAYMENT", "FUNDED", "DISBURSING"].includes(batch.status) || (onChain && queued > 0);
   const failedRecipients = batch.recipients.filter((r) => r.status === "FAILED");
+  const finalCount = batch.recipients.filter((r) => r.status === "SUCCEEDED" || r.status === "FAILED").length;
+  const recordedCount = batch.recipients.filter((r) => r.chainTxHash || r.proofHash).length;
 
   return (
     <>
@@ -103,6 +106,12 @@ export default async function BatchDetailPage({
             </li>
           ))}
         </ol>
+        {batch.paidAt && (
+          <div className="progress-grid">
+            <Progress label="Dikirim ke penerima" value={finalCount} total={batch.recipients.length} />
+            <Progress label="Bukti tercatat on-chain" value={recordedCount} total={batch.recipients.length} tone="amber" />
+          </div>
+        )}
       </section>
 
       <section className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr) 300px", alignItems: "start", marginTop: 16 }}>
@@ -117,30 +126,34 @@ export default async function BatchDetailPage({
             <table>
               <thead>
                 <tr>
-                  <th>Nama</th>
-                  <th>Bank</th>
+                  <th>Penerima</th>
                   <th>Rekening</th>
                   <th className="num">Nominal</th>
                   <th>Status</th>
-                  <th>Kode bukti</th>
                   <th>On-chain</th>
                 </tr>
               </thead>
               <tbody>
                 {batch.recipients.map((r) => (
                   <tr key={r.id}>
-                    <td>{r.name}</td>
-                    <td title={bankName(r.bankCode)}>{r.bankCode}</td>
-                    <td className="mono">{maskAccount(r.accountNumber)}</td>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{r.name}</div>
+                      <Link href={`/proof?code=${r.proofCode}`} className="mono small" style={{ whiteSpace: "nowrap" }}>
+                        {r.proofCode}
+                      </Link>
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <div title={bankName(r.bankCode)}>{r.bankCode}</div>
+                      <span className="mono muted small">{maskAccount(r.accountNumber)}</span>
+                    </td>
                     <td className="num">{formatRupiah(r.amount)}</td>
                     <td>
                       <RecipientStatusBadge status={r.status} />
-                      {r.failureCode && <div className="muted small mono">{r.failureCode}</div>}
-                    </td>
-                    <td>
-                      <Link href={`/proof?code=${r.proofCode}`} className="mono">
-                        {r.proofCode}
-                      </Link>
+                      {r.failureCode && (
+                        <div className="muted mono" style={{ fontSize: 11, marginTop: 3 }}>
+                          {r.failureCode}
+                        </div>
+                      )}
                     </td>
                     <td className="small">
                       {r.chainTxHash ? (

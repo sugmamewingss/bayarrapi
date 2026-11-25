@@ -32,6 +32,14 @@ Semua transaksi memakai **sandbox/test mode dan testnet**. Tidak ada uang nyata,
 - Solidity + Hardhat, jaringan Ethereum Sepolia
 - Basis data: SQLite via Prisma (cukup untuk prototipe)
 
+## Cara cepat (Windows)
+
+1. Pasang [Node.js](https://nodejs.org) versi 20 atau lebih baru.
+2. Klik dua kali `BayarRapi.bat` di folder utama repo. Skrip ini memasang dependensi (sekali saja), menyiapkan database, menjalankan server, lalu membuka browser.
+3. Opsional: klik dua kali `Buat-Shortcut-Desktop.bat` untuk membuat shortcut BayarRapi berikon logo di Desktop.
+
+Tanpa mengisi `.env`, aplikasi berjalan dalam mode simulasi. Untuk Xendit test mode dan pencatatan Sepolia, isi `apps/web/.env` (lihat `.env.example`). Jika `NGROK_DOMAIN` diisi, launcher sekaligus membuka tunnel ngrok untuk webhook Xendit.
+
 ## Cara menjalankan (lokal)
 
 Butuh Node.js 20 atau lebih baru.

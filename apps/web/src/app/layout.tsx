@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { paymentMode } from "@/lib/env";
+import { LogoMark, Wordmark } from "@/components/Logo";
+import NavLinks from "@/components/NavLinks";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -8,36 +10,48 @@ export const metadata: Metadata = {
   description: "Bayar sekali, teruskan ke banyak rekening, dengan bukti on-chain.",
 };
 
-function modeLabel(): string {
+function modeLabel(): { text: string; tone: string } {
   try {
-    return paymentMode() === "xendit" ? "Xendit test mode" : "Mode simulasi";
+    return paymentMode() === "xendit"
+      ? { text: "Xendit test mode", tone: "blue" }
+      : { text: "Mode simulasi", tone: "amber" };
   } catch {
-    return "Konfigurasi .env belum valid";
+    return { text: "Konfigurasi .env belum valid", tone: "red" };
   }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const mode = modeLabel();
   return (
     <html lang="id">
       <body>
         <header className="topbar">
           <div className="topbar-inner">
             <Link href="/" className="brand">
-              <span className="brand-mark">BR</span>
-              BayarRapi
+              <LogoMark size={32} animated />
+              <Wordmark />
             </Link>
-            <nav className="nav">
-              <Link href="/batches">Dashboard</Link>
-              <Link href="/batches/new">Buat batch</Link>
-              <Link href="/proof">Cek bukti</Link>
-              <Link href="/reports">Laporan</Link>
-            </nav>
-            <span className="mode-pill">SANDBOX · {modeLabel()}</span>
+            <NavLinks />
+            <span className={`mode-pill tone-${mode.tone}`}>
+              <i className="pulse-dot" />
+              Sandbox · {mode.text}
+            </span>
           </div>
         </header>
         <main className="container">{children}</main>
         <footer className="footer">
-          Prototipe Kelompok 3, Teknologi Blockchain dan Platform Keuangan Dijital. Tidak ada uang nyata.
+          <div className="footer-inner">
+            <div className="footer-brand">
+              <LogoMark size={28} />
+              <div>
+                <Wordmark />
+                <div className="muted small">Bayar sekali, teruskan ke banyak rekening.</div>
+              </div>
+            </div>
+            <div className="muted small">
+              Prototipe Kelompok 3, Teknologi Blockchain dan Platform Keuangan Dijital. Tidak ada uang nyata.
+            </div>
+          </div>
         </footer>
       </body>
     </html>

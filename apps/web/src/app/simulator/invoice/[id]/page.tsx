@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { formatRupiah } from "@/lib/constants";
 import SimulatorActions from "./SimulatorActions";
+import { LogoMark, Wordmark } from "@/components/Logo";
 
 export const dynamic = "force-dynamic";
 
@@ -21,8 +22,12 @@ export default async function SimulatorInvoicePage({ params }: { params: Promise
     <div className="pay-shell">
       <div className="alert alert-info">Ini halaman pembayaran simulasi. Tidak ada uang yang berpindah.</div>
       <div className="card">
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <LogoMark size={30} />
+          <Wordmark />
+        </div>
         <p className="muted small" style={{ marginBottom: 0 }}>
-          Tagihan BayarRapi
+          Total tagihan
         </p>
         <div className="pay-amount">{formatRupiah(amount)}</div>
         <div className="summary-line">

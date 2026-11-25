@@ -3,6 +3,9 @@
 // langganan Paket Bisnis (Rp149.000 per bulan). Harus sama dengan business case.
 export const FEE_PER_RECIPIENT = 2900;
 
+// Biaya Xendit per payout yang berhasil (Rupiah), dipakai di laporan rekonsiliasi.
+export const XENDIT_PAYOUT_COST = 2500;
+
 // Batas jumlah penerima per batch untuk prototipe.
 export const MAX_RECIPIENTS = 50;
 

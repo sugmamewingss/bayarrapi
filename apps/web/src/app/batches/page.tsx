@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { formatRupiah } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
 import { BatchStatusBadge } from "@/components/StatusBadge";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
@@ -28,22 +29,37 @@ export default async function BatchesPage() {
           </p>
         </div>
         <Link href="/batches/new" className="btn">
-          + Buat batch
+          <Icon name="upload" size={17} /> Buat batch
         </Link>
       </div>
 
       <section className="grid grid-3" style={{ marginBottom: 16 }}>
-        <div className="card">
-          <div className="stat-label">Total batch</div>
-          <div className="stat-value">{batches.length}</div>
+        <div className="card stat-card">
+          <div className="icon-bubble">
+            <Icon name="layers" size={22} />
+          </div>
+          <div>
+            <div className="stat-label">Total batch</div>
+            <div className="stat-value">{batches.length}</div>
+          </div>
         </div>
-        <div className="card">
-          <div className="stat-label">Dana sudah dibayar ke BayarRapi</div>
-          <div className="stat-value">{formatRupiah(totalAllocated)}</div>
+        <div className="card stat-card">
+          <div className="icon-bubble">
+            <Icon name="wallet" size={22} />
+          </div>
+          <div>
+            <div className="stat-label">Dana dibayar ke BayarRapi</div>
+            <div className="stat-value">{formatRupiah(totalAllocated)}</div>
+          </div>
         </div>
-        <div className="card">
-          <div className="stat-label">Penerima dari batch terbayar</div>
-          <div className="stat-value">{totalRecipients}</div>
+        <div className="card stat-card">
+          <div className="icon-bubble amber">
+            <Icon name="users" size={22} />
+          </div>
+          <div>
+            <div className="stat-label">Penerima dari batch terbayar</div>
+            <div className="stat-value">{totalRecipients}</div>
+          </div>
         </div>
       </section>
 

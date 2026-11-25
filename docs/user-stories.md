@@ -1,6 +1,6 @@
 # User Stories dan Kriteria Penerimaan
 
-Penanggung jawab: Rakapaksi. Versi awal, disesuaikan dengan konsep revisi 9 Nov 2026.
+Disesuaikan dengan konsep revisi 9 Nov 2026.
 
 | ID | User story | Kriteria penerimaan |
 | --- | --- | --- |

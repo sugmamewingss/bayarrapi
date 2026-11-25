@@ -12,6 +12,7 @@ Semua endpoint ada di `apps/web/src/app/api`.
 | GET | `/api/reports/reconciliation?from=&to=&format=csv` | Laporan rekonsiliasi, JSON atau CSV |
 | GET | `/api/proof/:code` | Cek bukti penerima terhadap catatan on-chain |
 | POST | `/api/chain/retry` | Ulangi pencatatan on-chain yang gagal |
+| POST | `/api/batches/:id/sync` | Tanyakan status invoice dan payout ke API Xendit (cadangan webhook) |
 
 ## Mode pembayaran
 
@@ -131,3 +132,7 @@ Per batch yang sudah dibayar: uang masuk, alokasi, terkirim, gagal, refund (nomi
 Kolom `cocok` bernilai YA jika uang masuk = terkirim + refund + fee transfer berhasil, tidak ada payout yang masih diproses, dan semua hasil sudah tercatat on-chain.
 
 Tambahkan `format=csv` untuk unduhan. Waktu dalam WIB. Baris pertama `sep=,` supaya Excel dengan setelan regional Indonesia tetap memisahkan kolom dengan benar.
+
+## POST /api/batches/:id/sync
+
+Cadangan jika webhook tidak bisa diterima, misalnya laptop tanpa URL publik. Server memanggil `GET /v2/invoices/:id` dan `GET /v2/payouts/:id` di Xendit, lalu memproses hasilnya lewat `processInvoiceEvent` dan `processPayoutEvent`, fungsi yang sama dengan webhook. Hasil yang sudah diproses webhook tidak diproses ulang karena `eventKey` unik. Di halaman detail batch (mode xendit), sinkronisasi berjalan otomatis tiap 5 detik selama batch menunggu pembayaran atau sedang dikirim, dan bisa dipicu lewat tombol "Cek status ke Xendit".

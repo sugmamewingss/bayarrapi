@@ -3,6 +3,7 @@ import { formatRupiah } from "@/lib/constants";
 import { bankName, formatDateTime, maskAccount } from "@/lib/format";
 import { BatchStatusBadge, RecipientStatusBadge } from "@/components/StatusBadge";
 import { verifyProof } from "@/lib/proof";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
@@ -74,20 +75,29 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
               Catatan blockchain
             </div>
             {check?.state === "verified" && (
-              <div className="small" style={{ margin: "4px 0" }}>
-                <span className="badge tone-green">Terverifikasi on-chain</span>{" "}
-                <span className="muted">
-                  Hash bukti cocok dengan smart contract, status {check.onChainStatus === "SUCCEEDED" ? "terkirim" : "gagal"},
-                  dicatat {formatDateTime(check.recordedAt)}.
+              <div className="proof-seal" style={{ margin: "8px 0" }}>
+                <span className="seal">
+                  <Icon name="shield" size={24} />
                 </span>
-                <div className="mono muted" style={{ wordBreak: "break-all", marginTop: 4 }}>
-                  {check.proofHash}
+                <div className="small" style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--brand-dark)" }}>Terverifikasi on-chain</div>
+                  <div className="muted">
+                    Hash bukti cocok dengan smart contract, status{" "}
+                    {check.onChainStatus === "SUCCEEDED" ? "terkirim" : "gagal"}, dicatat {formatDateTime(check.recordedAt)}.
+                  </div>
+                  <div className="mono muted" style={{ wordBreak: "break-all", marginTop: 4, fontSize: 12 }}>
+                    {check.proofHash}
+                  </div>
                 </div>
               </div>
             )}
             {check?.state === "mismatch" && (
-              <div className="small" style={{ margin: "4px 0" }}>
-                <span className="badge tone-red">Tidak cocok</span> <span className="muted">{check.reason}</span>
+              <div className="proof-seal bad" style={{ margin: "8px 0" }}>
+                <span className="seal">!</span>
+                <div className="small">
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--red)" }}>Tidak cocok</div>
+                  <div className="muted">{check.reason}</div>
+                </div>
               </div>
             )}
             {(check?.state === "pending" || check?.state === "unavailable") && (

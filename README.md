@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="./assets/logo-horizontal.png" alt="BayarRapi Logo" width="480" />
+  <img src="apps/web/public/brand/logo-horizontal.png" alt="BayarRapi Logo" width="480" />
 
   <h3>One Payment. Multiple Destinations.</h3>
 

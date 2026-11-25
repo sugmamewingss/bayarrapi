@@ -2,18 +2,21 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 
-// Baca contracts/.env (tidak di-commit). Isinya SEPOLIA_RPC_URL dan OPERATOR_PRIVATE_KEY.
+// Baca contracts/.env (tidak di-commit). Isinya SEPOLIA_RPC_URL, OPERATOR_PRIVATE_KEY, ETHERSCAN_API_KEY.
 dotenv.config();
 
-const { SEPOLIA_RPC_URL, OPERATOR_PRIVATE_KEY } = process.env;
+const { SEPOLIA_RPC_URL, OPERATOR_PRIVATE_KEY, ETHERSCAN_API_KEY } = process.env;
 
 const config: HardhatUserConfig = {
   solidity: "0.8.24",
   networks: {
     sepolia: {
-      url: SEPOLIA_RPC_URL ?? "",
+      url: SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com",
       accounts: OPERATOR_PRIVATE_KEY ? [OPERATOR_PRIVATE_KEY] : [],
     },
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY || "",
   },
 };
 

@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { formatRupiah } from "@/lib/constants";
 import { bankName, formatDateTime, maskAccount } from "@/lib/format";
 import { BatchStatusBadge, RecipientStatusBadge } from "@/components/StatusBadge";
+import { verifyProof } from "@/lib/proof";
+import Icon from "@/components/Icon";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,7 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
   const recipient = code
     ? await db.recipient.findUnique({ where: { proofCode: code }, include: { batch: true } })
     : null;
+  const check = recipient && code ? await verifyProof(code) : null;
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
@@ -38,7 +41,7 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
 
       {recipient && (
         <section className="card" style={{ marginTop: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
             <div>
               <div className="stat-label">Dialokasikan untuk</div>
               <h2 style={{ margin: 0 }}>{recipient.name}</h2>
@@ -71,17 +74,44 @@ export default async function ProofPage({ searchParams }: { searchParams: Promis
             <div className="small" style={{ fontWeight: 600 }}>
               Catatan blockchain
             </div>
-            {recipient.chainTxHash ? (
+            {check?.state === "verified" && (
+              <div className="proof-seal" style={{ margin: "8px 0" }}>
+                <span className="seal">
+                  <Icon name="shield" size={24} />
+                </span>
+                <div className="small" style={{ minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--brand-dark)" }}>Terverifikasi on-chain</div>
+                  <div className="muted">
+                    Hash bukti cocok dengan smart contract, status{" "}
+                    {check.onChainStatus === "SUCCEEDED" ? "terkirim" : "gagal"}, dicatat {formatDateTime(check.recordedAt)}.
+                  </div>
+                  <div className="mono muted" style={{ wordBreak: "break-all", marginTop: 4, fontSize: 12 }}>
+                    {check.proofHash}
+                  </div>
+                </div>
+              </div>
+            )}
+            {check?.state === "mismatch" && (
+              <div className="proof-seal bad" style={{ margin: "8px 0" }}>
+                <span className="seal">!</span>
+                <div className="small">
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--red)" }}>Tidak cocok</div>
+                  <div className="muted">{check.reason}</div>
+                </div>
+              </div>
+            )}
+            {(check?.state === "pending" || check?.state === "unavailable") && (
+              <div className="muted small">{check.reason}.</div>
+            )}
+            {recipient.chainTxHash && (
               <a
                 href={`https://sepolia.etherscan.io/tx/${recipient.chainTxHash}`}
                 target="_blank"
                 rel="noreferrer"
                 className="small"
               >
-                Lihat bukti pencairan di Etherscan (Sepolia)
+                Lihat transaksi di Etherscan (Sepolia)
               </a>
-            ) : (
-              <div className="muted small">Belum dicatat on-chain. Pencatatan aktif setelah modul blockchain terpasang.</div>
             )}
           </div>
         </section>

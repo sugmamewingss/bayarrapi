@@ -1,6 +1,5 @@
 # apps/web
 
-Aplikasi Next.js BayarRapi. Kode awal ditambahkan pada tahap pembuatan prototipe.
+Aplikasi Next.js BayarRapi: dashboard pengirim, API route, webhook Xendit, modul payout, pencatatan on-chain, laporan rekonsiliasi, dan halaman cek bukti penerima.
 
-- Frontend (Rakapaksi): form batch kirim, dashboard status, halaman cek bukti.
-- API dan webhook pay-in (Alfi), payout dan rekonsiliasi (Farhan), modul blockchain (Irfan).
+Cara menjalankan dan daftar endpoint: lihat [README utama](../../README.md) dan [docs/api.md](../../docs/api.md).

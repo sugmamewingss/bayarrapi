@@ -1,7 +1,5 @@
 # ERD (draf awal)
 
-Penanggung jawab: Farhan. Draf ini titik awal dan boleh diubah.
-
 ```mermaid
 erDiagram
     SENDER ||--o{ BATCH : membuat

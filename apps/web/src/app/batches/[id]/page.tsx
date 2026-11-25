@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { formatRupiah } from "@/lib/constants";
+import { FEE_PER_RECIPIENT, formatRupiah } from "@/lib/constants";
 import { bankName, formatDateTime, maskAccount } from "@/lib/format";
 import { BATCH_STEPS } from "@/lib/status";
 import { BatchStatusBadge, RecipientStatusBadge } from "@/components/StatusBadge";
+import AutoRefresh from "@/components/AutoRefresh";
+import RetryChainButton from "@/components/RetryChainButton";
+import { chainEnabled, processChainJobs } from "@/lib/chain";
+import Progress from "@/components/Progress";
 import PayButton from "./PayButton";
+
+const TX_URL = "https://sepolia.etherscan.io/tx/";
 
 export const dynamic = "force-dynamic";
 
@@ -35,9 +41,23 @@ export default async function BatchDetailPage({
   if (!batch) notFound();
 
   const grandTotal = batch.totalAmount + batch.feeAmount;
+  const onChain = chainEnabled();
+  const jobs = await db.chainJob.findMany({
+    where: { refId: { in: [batch.id, ...batch.recipients.map((r) => r.id)] } },
+  });
+  const queued = jobs.filter((j) => j.status === "QUEUED").length;
+  const failedJobs = jobs.filter((j) => j.status === "FAILED");
+  // Lanjutkan antrean yang tertinggal (misalnya setelah server dimatikan).
+  if (onChain && queued > 0) void processChainJobs();
+  const inProgress =
+    ["PENDING_PAYMENT", "FUNDED", "DISBURSING"].includes(batch.status) || (onChain && queued > 0);
+  const failedRecipients = batch.recipients.filter((r) => r.status === "FAILED");
+  const finalCount = batch.recipients.filter((r) => r.status === "SUCCEEDED" || r.status === "FAILED").length;
+  const recordedCount = batch.recipients.filter((r) => r.chainTxHash || r.proofHash).length;
 
   return (
     <>
+      <AutoRefresh active={inProgress} />
       <div className="page-head">
         <div>
           <Link href="/batches" className="small">
@@ -58,9 +78,19 @@ export default async function BatchDetailPage({
       {paid && batch.status === "PENDING_PAYMENT" && (
         <div className="alert alert-info">Pembayaran sedang dikonfirmasi. Muat ulang halaman ini dalam beberapa detik.</div>
       )}
-      {batch.status === "FUNDED" && (
-        <div className="alert alert-success">
-          Pembayaran terverifikasi lewat webhook. Pengiriman ke tiap penerima akan berjalan setelah modul payout aktif.
+      {(batch.status === "FUNDED" || batch.status === "DISBURSING") && (
+        <div className="alert alert-info">
+          Pembayaran terverifikasi lewat webhook. Dana sedang dikirim ke tiap penerima; halaman ini diperbarui otomatis.
+        </div>
+      )}
+      {batch.status === "COMPLETED" && (
+        <div className="alert alert-success">Semua penerima sudah menerima dana.</div>
+      )}
+      {batch.status === "PARTIAL_FAILED" && (
+        <div className="alert alert-error">
+          {failedRecipients.length} penerima gagal dikirim. Nominal dan fee-nya dikembalikan ke pengirim: total{" "}
+          {formatRupiah(failedRecipients.reduce((t, r) => t + r.amount + FEE_PER_RECIPIENT, 0))}. Tercatat di laporan
+          rekonsiliasi.
         </div>
       )}
       {batch.status === "EXPIRED" && <div className="alert alert-error">Invoice kedaluwarsa. Buat batch baru untuk mencoba lagi.</div>}
@@ -76,6 +106,12 @@ export default async function BatchDetailPage({
             </li>
           ))}
         </ol>
+        {batch.paidAt && (
+          <div className="progress-grid">
+            <Progress label="Dikirim ke penerima" value={finalCount} total={batch.recipients.length} />
+            <Progress label="Bukti tercatat on-chain" value={recordedCount} total={batch.recipients.length} tone="amber" />
+          </div>
+        )}
       </section>
 
       <section className="grid" style={{ gridTemplateColumns: "minmax(0, 1fr) 300px", alignItems: "start", marginTop: 16 }}>
@@ -90,28 +126,47 @@ export default async function BatchDetailPage({
             <table>
               <thead>
                 <tr>
-                  <th>Nama</th>
-                  <th>Bank</th>
+                  <th>Penerima</th>
                   <th>Rekening</th>
                   <th className="num">Nominal</th>
                   <th>Status</th>
-                  <th>Kode bukti</th>
+                  <th>On-chain</th>
                 </tr>
               </thead>
               <tbody>
                 {batch.recipients.map((r) => (
                   <tr key={r.id}>
-                    <td>{r.name}</td>
-                    <td title={bankName(r.bankCode)}>{r.bankCode}</td>
-                    <td className="mono">{maskAccount(r.accountNumber)}</td>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{r.name}</div>
+                      <Link href={`/proof?code=${r.proofCode}`} className="mono small" style={{ whiteSpace: "nowrap" }}>
+                        {r.proofCode}
+                      </Link>
+                    </td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <div title={bankName(r.bankCode)}>{r.bankCode}</div>
+                      <span className="mono muted small">{maskAccount(r.accountNumber)}</span>
+                    </td>
                     <td className="num">{formatRupiah(r.amount)}</td>
                     <td>
                       <RecipientStatusBadge status={r.status} />
+                      {r.failureCode && (
+                        <div className="muted mono" style={{ fontSize: 11, marginTop: 3 }}>
+                          {r.failureCode}
+                        </div>
+                      )}
                     </td>
-                    <td>
-                      <Link href={`/proof?code=${r.proofCode}`} className="mono">
-                        {r.proofCode}
-                      </Link>
+                    <td className="small">
+                      {r.chainTxHash ? (
+                        <a href={`${TX_URL}${r.chainTxHash}`} target="_blank" rel="noreferrer">
+                          Lihat tx
+                        </a>
+                      ) : r.proofHash ? (
+                        "Tercatat"
+                      ) : r.status === "SUCCEEDED" || r.status === "FAILED" ? (
+                        <span className="muted">Antre</span>
+                      ) : (
+                        <span className="muted">-</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -148,12 +203,30 @@ export default async function BatchDetailPage({
               ID invoice: <span className="mono">{batch.xenditInvoiceId}</span>
             </p>
           )}
-          {batch.chainTxHash && (
-            <p className="small" style={{ marginBottom: 0 }}>
-              <a href={`https://sepolia.etherscan.io/tx/${batch.chainTxHash}`} target="_blank" rel="noreferrer">
+          <h3 style={{ marginTop: 20 }}>Catatan blockchain</h3>
+          {!onChain && <p className="muted small">Pencatatan on-chain nonaktif: isi variabel Sepolia di apps/web/.env.</p>}
+          {batch.chainTxHash ? (
+            <p className="small">
+              <a href={`${TX_URL}${batch.chainTxHash}`} target="_blank" rel="noreferrer">
                 Lihat catatan batch di Etherscan
               </a>
             </p>
+          ) : (
+            onChain && Boolean(batch.paidAt) && <p className="muted small">Batch sedang dicatat ke Sepolia...</p>
+          )}
+          {batch.recipientsHash && (
+            <p className="muted small" style={{ wordBreak: "break-all" }}>
+              Hash penerima: <span className="mono">{batch.recipientsHash}</span>
+            </p>
+          )}
+          {onChain && queued > 0 && <p className="muted small">{queued} pencatatan dalam antrean.</p>}
+          {onChain && failedJobs.length > 0 && (
+            <>
+              <p className="small" style={{ color: "var(--red)" }}>
+                {failedJobs.length} pencatatan gagal. Terakhir: {failedJobs[0].lastError?.slice(0, 80)}
+              </p>
+              <RetryChainButton />
+            </>
           )}
         </aside>
       </section>

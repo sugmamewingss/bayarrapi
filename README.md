@@ -772,7 +772,7 @@ Fakultas Ilmu Komputer — Universitas Brawijaya
 
 <div align="center">
 
-  <img src="./assets/logo-horizontal.png" alt="BayarRapi" width="200" />
+  <img src="apps/web/public/brand/logo-512.png" alt="BayarRapi" width="200" />
 
   <h3>Pay Simply. Distribute Efficiently. Verify Transparently.</h3>
 

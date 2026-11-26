@@ -349,7 +349,7 @@ Salin konfigurasi environment.
 Untuk Git Bash, Linux, atau macOS:
 
 ```bash
-cp ../.env.example .env
+cp ../../.env.example .env
 ```
 
 Untuk Windows Command Prompt:
